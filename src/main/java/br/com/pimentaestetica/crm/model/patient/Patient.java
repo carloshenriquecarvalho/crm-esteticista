@@ -1,0 +1,90 @@
+package br.com.pimentaestetica.crm.model.patient;
+
+import br.com.pimentaestetica.crm.model.appoinment.Appointment;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "patients")
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    private List<Appointment> appointments = new ArrayList<>();
+
+    @Column(name = "name", length = 45, nullable = false)
+    private String name;
+
+    @Column(name = "email", length = 55, nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "phone_number", length = 25, nullable = false)
+    private String phoneNumber;
+
+    @Column(name = "active")
+    private Boolean active = true;
+
+    public Patient(){}
+
+    public Patient(UUID id, String name, String email, String phoneNumber, List<Appointment> appointments, Boolean active) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.appointments = appointments;
+        this.active = active;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+}
