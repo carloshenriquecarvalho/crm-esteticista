@@ -1,11 +1,10 @@
 package br.com.pimentaestetica.crm.model.user;
 
-import br.com.pimentaestetica.crm.model.appoinment.Appointment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/user")
+@RequestMapping(path = "/api/user")
 public class UserController {
 
     @Autowired
