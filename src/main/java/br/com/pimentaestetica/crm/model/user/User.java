@@ -1,7 +1,6 @@
 package br.com.pimentaestetica.crm.model.user;
 
-import br.com.pimentaestetica.crm.model.appoinment.Appointment;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import br.com.pimentaestetica.crm.model.appointment.Appointment;
 import jakarta.persistence.*;
 
 import java.util.*;

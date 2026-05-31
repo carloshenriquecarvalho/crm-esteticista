@@ -1,6 +1,6 @@
 package br.com.pimentaestetica.crm.model.procedure;
 
-import br.com.pimentaestetica.crm.model.appoinment.Appointment;
+import br.com.pimentaestetica.crm.model.appointment.Appointment;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

@@ -1,5 +1,7 @@
-package br.com.pimentaestetica.crm.model.user;
+package br.com.pimentaestetica.crm.controller;
 
+import br.com.pimentaestetica.crm.model.user.User;
+import br.com.pimentaestetica.crm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

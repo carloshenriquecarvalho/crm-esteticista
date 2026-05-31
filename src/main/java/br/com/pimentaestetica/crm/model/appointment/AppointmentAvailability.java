@@ -1,4 +1,4 @@
-package br.com.pimentaestetica.crm.model.appoinment;
+package br.com.pimentaestetica.crm.model.appointment;
 
 public enum AppointmentAvailability {
     PAID,

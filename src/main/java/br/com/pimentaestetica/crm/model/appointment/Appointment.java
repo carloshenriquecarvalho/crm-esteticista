@@ -1,4 +1,4 @@
-package br.com.pimentaestetica.crm.model.appoinment;
+package br.com.pimentaestetica.crm.model.appointment;
 
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
 import br.com.pimentaestetica.crm.model.patient.Patient;
