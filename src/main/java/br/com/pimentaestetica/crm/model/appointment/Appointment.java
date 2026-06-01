@@ -45,7 +45,6 @@ public class Appointment {
     public Appointment(){}
 
     public Appointment(UUID id, String title, AppointmentAvailability appointmentAvailability, LocalDateTime dateTimeStart, Patient patient, Procedure procedure, Beautician beautician, User user) {
-        this.id = id;
         this.title = title;
         this.appointmentAvailability = appointmentAvailability;
         this.dateTimeStart = dateTimeStart;

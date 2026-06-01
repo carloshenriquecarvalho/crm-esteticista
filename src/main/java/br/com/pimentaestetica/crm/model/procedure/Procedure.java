@@ -1,6 +1,7 @@
 package br.com.pimentaestetica.crm.model.procedure;
 
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
+import br.com.pimentaestetica.crm.model.user.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ public class Procedure {
 
     @OneToMany(mappedBy = "procedure", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -36,14 +41,14 @@ public class Procedure {
 
     public Procedure(){}
 
-    public Procedure(UUID id, String name, BigDecimal value, Integer durationMinutes, ProcedureAvailability procedureAvailability, List<Appointment> appointments, Boolean active) {
-        this.id = id;
+    public Procedure(UUID id, String name, BigDecimal value, Integer durationMinutes, ProcedureAvailability procedureAvailability, List<Appointment> appointments, Boolean active, User user) {
         this.name = name;
         this.value = value;
         this.durationMinutes = durationMinutes;
         this.procedureAvailability = procedureAvailability;
         this.appointments = appointments;
         this.active = active;
+        this.user = user;
     }
 
     public UUID getId() {
@@ -100,5 +105,13 @@ public class Procedure {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

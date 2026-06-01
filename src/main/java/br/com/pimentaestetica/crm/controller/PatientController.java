@@ -3,6 +3,7 @@ package br.com.pimentaestetica.crm.controller;
 import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,20 +20,20 @@ public class PatientController {
     // Crud
     // Create Patient
     @PostMapping
-    public Patient add(@RequestBody Patient patient){
-        return patientService.createPatient(patient);
+    public Patient add(@RequestBody Patient patient, @RequestBody UUID id){
+        return patientService.createPatient(patient, id);
     }
 
     // Get All patients
-    @GetMapping
-    public List<Patient> getAll(){
-        return patientService.getAllPatients();
+    @GetMapping("/{id}/patient")
+    public List<Patient> getAll(@PathVariable UUID id){
+        return patientService.getAllPatients(id);
     }
 
     // Get patient by id
     @GetMapping("/{id}")
-    public Optional<Patient> getById(@PathVariable UUID id){
-        return patientService.getPatientById(id);
+    public ResponseEntity<Optional<Patient>> getById(@PathVariable UUID id){
+        return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
     // Update patient

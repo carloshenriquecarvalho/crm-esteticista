@@ -1,6 +1,7 @@
 package br.com.pimentaestetica.crm.model.beautician;
 
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
+import br.com.pimentaestetica.crm.model.user.User;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ public class Beautician {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @OneToMany(mappedBy = "beautician", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
@@ -33,13 +38,13 @@ public class Beautician {
 
     public Beautician(){}
 
-    public Beautician(UUID id, String name, String email, BeauticianStatus status, ArrayList<Appointment> appointments, Boolean active) {
-        this.id = id;
+    public Beautician(UUID id, String name, String email, BeauticianStatus status, ArrayList<Appointment> appointments, Boolean active, User user) {
         this.name = name;
         this.email = email;
         this.status = status;
         this.appointments = appointments;
         this.active = active;
+        this.user = user;
     }
 
     public UUID getId() {
@@ -88,5 +93,13 @@ public class Beautician {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

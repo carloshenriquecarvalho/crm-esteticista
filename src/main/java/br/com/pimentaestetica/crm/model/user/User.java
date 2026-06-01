@@ -1,6 +1,9 @@
 package br.com.pimentaestetica.crm.model.user;
 
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
+import br.com.pimentaestetica.crm.model.beautician.Beautician;
+import br.com.pimentaestetica.crm.model.patient.Patient;
+import br.com.pimentaestetica.crm.model.procedure.Procedure;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -12,8 +15,17 @@ public class User{
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Patient> patients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Appointment> appointments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Beautician> beauticians = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Procedure> procedures = new ArrayList<>();
 
     @Column(name = "name", nullable = false, length = 180)
     private String name;
@@ -24,7 +36,7 @@ public class User{
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "enabled", nullable = false, columnDefinition = "BOOLEAN")
+    @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
     @Column(name = "account_non_locked", nullable = false)
@@ -38,14 +50,13 @@ public class User{
 
     public User(){}
 
-    public User(String name, String email, String password, boolean enabled, boolean accountNonLocked, Set<UserRole> roles, List<Appointment> appointments) {
+    public User(String name, String email, String password, boolean enabled, boolean accountNonLocked, Set<UserRole> roles,List<Patient> patients, List<Appointment> appointments, List<Beautician> beauticians, List<Procedure> procedures) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.enabled = enabled;
         this.accountNonLocked = accountNonLocked;
         this.roles = roles;
-        this.appointments = appointments;
     }
 
     public UUID getId() {
@@ -111,4 +122,32 @@ public class User{
     public void setRoles(Set<UserRole> roles) {
         this.roles = roles;
     }
+
+    public List<Patient> getPatients() {
+        return patients;
+    }
+
+    public List<Beautician> getBeauticians() {
+        return beauticians;
+    }
+
+    public List<Procedure> getProcedures() {
+        return procedures;
+    }
+
+    public void addPatient(Patient patient) {
+        this.patients.add(patient);
+        patient.setUser(this);
+    }
+
+    public void addBeautician(Beautician beautician) {
+        this.beauticians.add(beautician);
+        beautician.setUser(this);
+    }
+
+    public void addProcedure(Procedure procedure) {
+        this.procedures.add(procedure);
+        procedure.setUser(this);
+    }
+
 }
