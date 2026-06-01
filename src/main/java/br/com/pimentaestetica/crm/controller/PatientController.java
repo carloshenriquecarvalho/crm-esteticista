@@ -1,10 +1,12 @@
 package br.com.pimentaestetica.crm.controller;
 
 import br.com.pimentaestetica.crm.model.patient.Patient;
+import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +19,31 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    // Create - Corrigido: userId agora vem como Query Param
     @PostMapping
-    public ResponseEntity<Patient> add(@RequestBody Patient patient, @RequestParam UUID userId) {
-        Patient created = patientService.createPatient(patient, userId);
+    public ResponseEntity<Patient> add(@RequestBody Patient patient, @AuthenticationPrincipal User user) {
+        Patient created = patientService.createPatient(patient, user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Get All by User
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<Patient>> getAll(@PathVariable UUID userId) {
-        List<Patient> patients = patientService.getAllPatients(userId);
+    @GetMapping("/all")
+    public ResponseEntity<List<Patient>> getAll(@AuthenticationPrincipal User user) {
+        List<Patient> patients = patientService.getAllPatients(user);
         return ResponseEntity.ok(patients);
     }
 
-    // Get by Id - Tratado Optional
+    // Get by Id
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getById(@PathVariable UUID id) {
-        return patientService.getPatientById(id)
+    public ResponseEntity<Patient> getById(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+        return patientService.getPatientById(id, user.getId())
                 .map(patient -> ResponseEntity.ok().body(patient))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Update
-    @PutMapping("/{id}")
-    public ResponseEntity<Patient> update(@PathVariable UUID id, @RequestBody Patient patient) {
-        Patient updated = patientService.updatePatientById(id, patient);
+    @PutMapping
+    public ResponseEntity<Patient> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody Patient patient) {
+        Patient updated = patientService.updatePatientById(user.getId(), patientId, patient);
         return ResponseEntity.ok(updated);
     }
 

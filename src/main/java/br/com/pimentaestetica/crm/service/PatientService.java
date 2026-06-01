@@ -7,6 +7,7 @@ import br.com.pimentaestetica.crm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,22 +37,25 @@ public class PatientService {
 
     // Read
     // Get all
-    public List<Patient> getAllPatients(UUID userId){
-        return patientRepository.findAllByUserId(userId, Sort.by("name").ascending());
+    public List<Patient> getAllPatients(@AuthenticationPrincipal User user){
+        return patientRepository.findAllByUserId( Sort.by("name").ascending(), user.getId());
     }
 
     // Get By Id
-    public Optional<Patient> getPatientById(UUID id){
-        return Optional.of(patientRepository.findById(id)
+    public Optional<Patient> getPatientById(UUID userId, UUID patientId){
+        return Optional.of(patientRepository.findByIdAndUserId(patientId, userId)
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado")));
     }
 
     // Update by Id
     @Transactional
-    public Patient updatePatientById(UUID id, Patient patientData) {
-        Patient patient = patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente nao " +
+    public Patient updatePatientById(UUID patientId, UUID userId, Patient patientData) {
+        Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Paciente nao " +
                 "encontrado"));
+        User user= userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+        patient.setUser(user);
         patient.setActive(true);
         patient.setEmail(patientData.getEmail());
         patient.setName(patientData.getName());
