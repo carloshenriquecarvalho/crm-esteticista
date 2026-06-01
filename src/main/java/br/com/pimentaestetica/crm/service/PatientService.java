@@ -32,4 +32,25 @@ public class PatientService {
     public Optional<Patient> getPatientById(UUID id){
         return patientRepository.findById(id);
     }
+
+    // Update by Id
+    public Patient updatePatientById(UUID id, Patient patientData) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente nao " +
+                "encontrado"));
+
+        patient.setActive(true);
+        patient.setEmail(patientData.getEmail());
+        patient.setName(patientData.getName());
+        patient.setPhoneNumber(patient.getPhoneNumber());
+
+        return patientRepository.save(patient);
+    }
+
+    // Delete by Id
+    public boolean deletePatientById(UUID id){
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente nao encontrado"));
+        patientRepository.deleteById(patient.getId());
+        return true;
+    }
+
 }
