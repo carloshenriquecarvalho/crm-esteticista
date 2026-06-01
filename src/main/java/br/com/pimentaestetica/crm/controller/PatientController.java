@@ -3,11 +3,11 @@ package br.com.pimentaestetica.crm.controller;
 import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -17,35 +17,39 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    // Crud
-    // Create Patient
+    // Create - Corrigido: userId agora vem como Query Param
     @PostMapping
-    public Patient add(@RequestBody Patient patient, @RequestBody UUID id){
-        return patientService.createPatient(patient, id);
+    public ResponseEntity<Patient> add(@RequestBody Patient patient, @RequestParam UUID userId) {
+        Patient created = patientService.createPatient(patient, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // Get All patients
-    @GetMapping("/{id}/patient")
-    public List<Patient> getAll(@PathVariable UUID id){
-        return patientService.getAllPatients(id);
+    // Get All by User
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<Patient>> getAll(@PathVariable UUID userId) {
+        List<Patient> patients = patientService.getAllPatients(userId);
+        return ResponseEntity.ok(patients);
     }
 
-    // Get patient by id
+    // Get by Id - Tratado Optional
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Patient>> getById(@PathVariable UUID id){
-        return ResponseEntity.ok(patientService.getPatientById(id));
+    public ResponseEntity<Patient> getById(@PathVariable UUID id) {
+        return patientService.getPatientById(id)
+                .map(patient -> ResponseEntity.ok().body(patient))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Update patient
+    // Update
     @PutMapping("/{id}")
-    public Patient update(@PathVariable UUID id, @RequestBody Patient patient) {
-        return patientService.updatePatientById(patient.getId(), patient);
+    public ResponseEntity<Patient> update(@PathVariable UUID id, @RequestBody Patient patient) {
+        Patient updated = patientService.updatePatientById(id, patient);
+        return ResponseEntity.ok(updated);
     }
 
-    // Delete patient
-    @DeleteMapping
-    public boolean delete(@PathVariable UUID id) {
-        return patientService.deletePatientById(id);
+    // Delete - Retorna 204 No Content
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        patientService.deletePatientById(id);
+        return ResponseEntity.noContent().build();
     }
-
 }

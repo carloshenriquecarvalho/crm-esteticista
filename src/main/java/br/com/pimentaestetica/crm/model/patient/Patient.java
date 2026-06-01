@@ -2,8 +2,9 @@ package br.com.pimentaestetica.crm.model.patient;
 
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
 import br.com.pimentaestetica.crm.model.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,89 +17,33 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JsonBackReference(value = "user-patients") // Nome pareado com o User
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonManagedReference(value = "patient-appointments") // Nome pareado com o Appointment
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
 
-    @Column(name = "name", length = 45, nullable = false)
-    private String name;
-
-    @Column(name = "email", length = 55, nullable = false, unique = true)
-    private String email;
-
-    @Column(name = "phone_number", length = 25, nullable = false)
-    private String phoneNumber;
-
-    @Column(name = "active")
-    private Boolean active = true;
-
+    // ... Restante do código mantido sem alterações
+    @Column(name = "name", length = 45, nullable = false) private String name;
+    @Column(name = "email", length = 55, nullable = false, unique = true) private String email;
+    @Column(name = "phone_number", length = 25, nullable = false) private String phoneNumber;
+    @Column(name = "active") private Boolean active = true;
     public Patient(){}
-
-    public Patient(UUID id, String name, String email, String phoneNumber, List<Appointment> appointments, Boolean active, User user) {
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.appointments = appointments;
-        this.active = active;
-        this.user = user;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public List<Appointment> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(List<Appointment> appointments) {
-        this.appointments = appointments;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public List<Appointment> getAppointments() { return appointments; }
+    public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
