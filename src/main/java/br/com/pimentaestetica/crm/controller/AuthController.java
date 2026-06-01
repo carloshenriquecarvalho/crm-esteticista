@@ -1,11 +1,12 @@
 package br.com.pimentaestetica.crm.controller;
 
+import br.com.pimentaestetica.crm.config.JWTTokenConfig;
 import br.com.pimentaestetica.crm.dto.request.LoginRequest;
 import br.com.pimentaestetica.crm.dto.request.RegisterUserRequest;
 import br.com.pimentaestetica.crm.dto.response.LoginResponse;
 import br.com.pimentaestetica.crm.dto.response.RegisterUserResponse;
 import br.com.pimentaestetica.crm.model.user.User;
-import br.com.pimentaestetica.crm.repository.UserRepository;
+import br.com.pimentaestetica.crm.model.user.UserRole;
 import br.com.pimentaestetica.crm.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -36,19 +37,22 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public AuthController(){}
+    @Autowired
+    private JWTTokenConfig tokenConfig;
 
-    public AuthController(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+    // Construtor padrão limpo (Sem duplicidade manual)
+    public AuthController(){}
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
-        UsernamePasswordAuthenticationToken userAndPasswordToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
+        var userAndPasswordToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         Authentication authentication = authenticationManager.authenticate(userAndPasswordToken);
 
-        return null;
+        User user = (User) authentication.getPrincipal();
+        String token = tokenConfig.generateToken(user);
 
+        // Retorno populado corretamente com o DTO
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
     @PostMapping("/register")
@@ -57,8 +61,14 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setEmail(request.email());
         user.setName(request.name());
-        
-        userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterUserResponse(user.getUsername(), user.getEmail()));
+
+        Set<UserRole> defaultRoles = new HashSet<>();
+        defaultRoles.add(UserRole.ROLE_ADMIN);
+        user.setRoles(defaultRoles);
+
+        User savedUser = userService.createUser(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new RegisterUserResponse(savedUser.getName(), savedUser.getEmail()));
     }
 }
