@@ -1,7 +1,6 @@
 package br.com.pimentaestetica.crm.service;
 
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
-import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.repository.BeauticianRepository;
 import br.com.pimentaestetica.crm.repository.UserRepository;
