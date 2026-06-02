@@ -7,6 +7,7 @@ import br.com.pimentaestetica.crm.model.procedure.Procedure;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.repository.*;
 import jakarta.transaction.Transactional;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -61,22 +62,25 @@ public class AppointmentService {
     }
 
     // Get one by id
-    public Optional<Appointment> getAppointmentById(UUID id) {
-        return Optional.of(appointmentRepository.findById(id)
+    public Optional<Appointment> getAppointmentById(UUID patientId, UUID userId) {
+        if(userId == null) {
+            throw new RuntimeException("Usuário não existente");
+        }
+        return Optional.of(appointmentRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado")));
     }
 
     // Update by id
     @Transactional
-    public Appointment updateAppointmentById(UUID id, Appointment appointmentData, UUID patientId, UUID beauticianId, UUID procedureId) {
-        Appointment appointment = appointmentRepository.findById(id)
+    public Appointment updateAppointmentById(@NonNull UUID userId, UUID appointmentId, Appointment appointmentData, UUID patientId, UUID beauticianId, UUID procedureId) {
+        Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
 
-        Patient patient = patientRepository.findById(patientId)
+        Patient patient = patientRepository.findByIdAndUserId(patientId, userId)
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
-        Beautician beautician = beauticianRepository.findById(beauticianId)
+        Beautician beautician = beauticianRepository.findByIdAndUserId(beauticianId, userId)
                 .orElseThrow(() -> new RuntimeException("Esteticista não encontrada"));
-        Procedure procedure = procedureRepository.findById(procedureId)
+        Procedure procedure = procedureRepository.findByIdAndUserId(procedureId, userId)
                 .orElseThrow(() -> new RuntimeException("Procedimento não encontrado"));
 
         appointment.setPatient(patient);
@@ -92,11 +96,8 @@ public class AppointmentService {
 
     // Delete by id
     @Transactional
-    public boolean deleteAppointmentById(UUID id) {
-        if(!appointmentRepository.existsById(id)){
-            throw new RuntimeException("Agendamento não existe");
-        }
-        appointmentRepository.deleteById(id);
-        return true;
+    public void deleteAppointmentById(UUID appointmentId, UUID userId) {
+        Appointment appointment = appointmentRepository.findByIdAndUserId(appointmentId, userId).orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+        appointmentRepository.delete(appointment);
     }
 }

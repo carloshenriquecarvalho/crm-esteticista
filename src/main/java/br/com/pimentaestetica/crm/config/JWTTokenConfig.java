@@ -14,7 +14,7 @@ import java.time.temporal.ChronoUnit;
 @Component
 public class JWTTokenConfig {
 
-    // Evite Hardcode. Pega do application.properties ou usa o fallback seguro
+    
     @Value("${api.security.token.secret:51577e233289b6d81ae3177c28ce35b6051829255a698b811ad3ec810101659dc6153e5ea80c125ef9791c115913c88ee06f63b7082b775e929c725eceb258cb}")
     private String secretKey;
 

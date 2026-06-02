@@ -2,10 +2,12 @@ package br.com.pimentaestetica.crm.controller;
 
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
 
+import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +22,10 @@ public class AppointmentController {
     // Crud
     // Create Patient
     @PostMapping
-    public ResponseEntity<Appointment> create(@RequestBody Appointment appointment) {
+    public ResponseEntity<Appointment> create(@RequestBody Appointment appointment, @AuthenticationPrincipal User user) {
         Appointment createdAppointment = appointmentService.createAppointment(
                 appointment,
-                appointment.getUser().getId(),
+                user.getId(),
                 appointment.getPatient().getId(),
                 appointment.getBeautician().getId(),
                 appointment.getProcedure().getId()
@@ -33,38 +35,39 @@ public class AppointmentController {
     }
 
     // Get all appointments by user id
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<Appointment>> getAll(@PathVariable UUID userId) {
-        List<Appointment> appointments = appointmentService.getAllAppointments(userId);
+    @GetMapping("/all")
+    public ResponseEntity<List<Appointment>> getAll(@AuthenticationPrincipal User user) {
+        List<Appointment> appointments = appointmentService.getAllAppointments(user.getId());
         return ResponseEntity.ok(appointments);
     }
 
     // Get appointment by id
-    @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getById(@PathVariable UUID id) {
-        return appointmentService.getAppointmentById(id)
+    @GetMapping("/{appointmentId}")
+    public ResponseEntity<Appointment> getById(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user) {
+        return appointmentService.getAppointmentById(appointmentId, user.getId())
                 .map(appointment -> ResponseEntity.ok().body(appointment))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Update appointment
-    @PutMapping("/{id}")
-    public ResponseEntity<Appointment> update(@PathVariable UUID id, @RequestBody Appointment appointment) {
+    @PutMapping("/{appointmentId}")
+    public ResponseEntity<Appointment> update(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user, @RequestBody Appointment appointment) {
         Appointment updatedAppointment = appointmentService.updateAppointmentById(
-                id,
+                user.getId(),
+                appointmentId,
                 appointment,
-                appointment.getPatient().getId(),
-                appointment.getBeautician().getId(),
-                appointment.getProcedure().getId()
+                appointment.getPatient() != null ? appointment.getPatient().getId() : null,
+                appointment.getBeautician() != null ? appointment.getBeautician().getId() : null,
+                appointment.getProcedure() != null ? appointment.getProcedure().getId() : null
         );
 
         return ResponseEntity.ok(updatedAppointment);
     }
 
     // Delete appointment
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        appointmentService.deleteAppointmentById(id);
+    @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user) {
+        appointmentService.deleteAppointmentById(appointmentId, user.getId());
         return ResponseEntity.noContent().build();
     }
 }

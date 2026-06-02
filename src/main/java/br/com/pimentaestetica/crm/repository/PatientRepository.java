@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface PatientRepository extends JpaRepository<Patient, UUID> {
     List<Patient> findAllByUserId(Sort sort, UUID userId);
 
-    Optional<Patient> findByIdAndUserId(UUID id, UUID userId);
+    Optional<Patient> findByIdAndUserId(UUID patientId, UUID userId);
 }
