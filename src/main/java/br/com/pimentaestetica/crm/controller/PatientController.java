@@ -52,8 +52,8 @@ public class PatientController {
     // Update
     @PutMapping
     @Operation(summary = "Atualiza um paciente.", description = "Retorna um único paciente atualizado a partir do id do paciente e do id do usuário extraído do JWT.")
-    public ResponseEntity<PatientResponse> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody Patient patient) {
-        Patient updated = patientService.updatePatientById(user.getId(), patientId, patient);
+    public ResponseEntity<PatientResponse> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody PatientRequest patientRequest) {
+        Patient updated = patientService.updatePatientById(user.getId(), patientId, patientRequest);
 
 
         return ResponseEntity.ok(new PatientResponse(updated));

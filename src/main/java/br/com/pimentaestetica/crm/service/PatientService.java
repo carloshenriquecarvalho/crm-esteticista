@@ -56,17 +56,16 @@ public class PatientService {
 
     // Update by Id
     @Transactional
-    public Patient updatePatientById(UUID patientId, UUID userId, Patient patientData) {
-        Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Paciente nao " +
-                "encontrado"));
+    public Patient updatePatientById(UUID patientId, UUID userId, PatientRequest patientData) {
+        Patient patient = patientRepository.findByIdAndUserId(patientId, userId).orElseThrow(() -> new RuntimeException("Paciente nao encontrado"));
         User user= userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         patient.setUser(user);
         patient.setActive(true);
-        patient.setEmail(patientData.getEmail());
-        patient.setName(patientData.getName());
-        patient.setPhoneNumber(patientData.getPhoneNumber());
+        patient.setEmail(patientData.email());
+        patient.setName(patientData.name());
+        patient.setPhoneNumber(patientData.phoneNumber());
 
         return patientRepository.save(patient);
     }

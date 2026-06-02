@@ -1,5 +1,6 @@
 package br.com.pimentaestetica.crm.service;
 
+import br.com.pimentaestetica.crm.dto.request.BeauticianRequest;
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.repository.BeauticianRepository;
@@ -24,7 +25,13 @@ public class BeauticianService {
 
     // Create
     @Transactional
-    public Beautician createBeautician(Beautician beautician, UUID userId) {
+    public Beautician createBeautician(BeauticianRequest beauticianRequest, UUID userId) {
+
+        Beautician beautician = new Beautician();
+
+        beautician.setName(beauticianRequest.name());
+        beautician.setEmail(beauticianRequest.email());
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         user.addBeautician(beautician);
@@ -38,9 +45,9 @@ public class BeauticianService {
     }
 
     // Get one By Id
-    public Optional<Beautician> getBeauticianById(UUID beauticianId, UUID userId){
-        return Optional.of(beauticianRepository.findByIdAndUserId(beauticianId, userId)
-                .orElseThrow(() -> new RuntimeException("Esteticista não encontrada")));
+    public Beautician getBeauticianById(UUID beauticianId, UUID userId){
+        return beauticianRepository.findByIdAndUserId(beauticianId, userId)
+                .orElseThrow(() -> new RuntimeException("Esteticista não encontrada"));
     }
 
     // Update by Id

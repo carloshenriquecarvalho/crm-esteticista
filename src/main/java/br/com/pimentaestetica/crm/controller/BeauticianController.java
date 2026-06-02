@@ -1,5 +1,7 @@
 package br.com.pimentaestetica.crm.controller;
 
+import br.com.pimentaestetica.crm.dto.request.BeauticianRequest;
+import br.com.pimentaestetica.crm.dto.response.BeauticianResponse;
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
 import br.com.pimentaestetica.crm.model.user.User;
@@ -26,41 +28,48 @@ public class BeauticianController {
 
     @PostMapping
     @Operation(summary = "Cria uma nova esteticista segura.", description = "Gera uma esteticista atrelada ao usuário extraído do JWT.")
-    public ResponseEntity<Beautician> add(@RequestBody Beautician beautician, @AuthenticationPrincipal User user) {
-        Beautician created = beauticianService.createBeautician(beautician, user.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<BeauticianResponse> add(@RequestBody BeauticianRequest beauticianRequest, @AuthenticationPrincipal User user) {
+        Beautician created = beauticianService.createBeautician(beauticianRequest, user.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BeauticianResponse(created));
     }
 
     // Get All by User
     @GetMapping("/all")
     @Operation(summary = "Recebe todas as esteticistas.", description = "Retorna todas as esteticistas que estão atreladas ao usuário extraído do JWT.")
-    public ResponseEntity<List<Beautician>> getAll(@AuthenticationPrincipal User user) {
-        List<Beautician> beauticians = beauticianService.getAllBeauticians(user.getId());
-        return ResponseEntity.ok(beauticians);
+    public ResponseEntity<List<BeauticianResponse>> getAll(@AuthenticationPrincipal User user) {
+        List<BeauticianResponse> beauticianResponses = beauticianService.getAllBeauticians(user.getId()).stream().map(BeauticianResponse::new).toList();
+        return ResponseEntity.ok(beauticianResponses);
     }
 
     // Get by Id
     @GetMapping("/{beauticianId}")
     @Operation(summary = "Recebe apenas uma esteticista.", description = "Retorna uma única esteticista baseado no id da esteticista e que esteja atrelada ao id do usuário extraído do JWT.")
-    public ResponseEntity<Beautician> getById(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {
-        return beauticianService.getBeauticianById(beauticianId, user.getId())
-                .map(beautician -> ResponseEntity.ok().body(beautician))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<BeauticianResponse> getById(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {
+
+        BeauticianResponse beauticianResponse = new BeauticianResponse(beauticianService.getBeauticianById(beauticianId, user.getId()));
+
+        return ResponseEntity.ok(beauticianResponse);
     }
 
     // Update
     @PutMapping("/{beauticianId}")
     @Operation(summary = "Atualiza uma esteticista.", description = "Retorna uma única esteticista atualizada a partir do id da esteticista e do id do usuário extraído do JWT.")
-    public ResponseEntity<Beautician> update(@PathVariable UUID beauticianId, @RequestBody Beautician beautician, @AuthenticationPrincipal User user) {
+    public ResponseEntity<BeauticianResponse> update(@PathVariable UUID beauticianId, @RequestBody BeauticianRequest beauticianRequest, @AuthenticationPrincipal User user) {
+
+        Beautician beautician = new Beautician();
+
+        beautician.setName(beauticianRequest.name());
+        beautician.setEmail(beauticianRequest.email());
+
         Beautician updatedBeautician = beauticianService.updateBeauticianById(
                 user.getId(),
                 beautician,
                 beauticianId
         );
-        return ResponseEntity.ok(updatedBeautician);
+        return ResponseEntity.ok(new BeauticianResponse(updatedBeautician));
     }
 
-    // Delete - Retorna 204 No Content
+    // Delete
     @DeleteMapping("/{beauticianId}")
     @Operation(summary = "Deleta uma esteticista.", description = "Deleta a esteticista através do seu id e que esteja atrelada ao usuário.")
     public ResponseEntity<Void> delete(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {

@@ -3,7 +3,6 @@ package br.com.pimentaestetica.crm.dto.response;
 import br.com.pimentaestetica.crm.model.procedure.Procedure;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 public record ProcedureResponse(UUID id, String name, BigDecimal value, Integer durationMinutes, String availability) {
