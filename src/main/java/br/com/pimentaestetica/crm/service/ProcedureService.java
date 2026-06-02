@@ -40,15 +40,14 @@ public class ProcedureService {
     }
 
     // Get procedure by id
-    public Optional<Procedure> getProcedureById(UUID id) {
-        return Optional.of(procedureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Procedimento não encontrado")));
+    public Optional<Procedure> getProcedureById(UUID procedureId, UUID userId) {
+        return procedureRepository.findByIdAndUserId(procedureId, userId);
     }
 
     // Update procedure by id
     @Transactional
-    public Procedure updateProcedureById(UUID id, Procedure procedureData) {
-        Procedure procedure = procedureRepository.findById(id)
+    public Procedure updateProcedureById(UUID procedureId, Procedure procedureData, UUID userId) {
+        Procedure procedure = procedureRepository.findByIdAndUserId(procedureId, userId)
                 .orElseThrow(() -> new RuntimeException("Procedimento não encontrado"));
 
         procedure.setName(procedureData.getName());
@@ -60,12 +59,10 @@ public class ProcedureService {
 
     // Delete procedure by id
     @Transactional
-    public boolean deleteProcedureById(UUID id) {
-        if(!procedureRepository.existsById(id)) {
-            throw new RuntimeException("Procedimento não existe.");
-        }
-        procedureRepository.deleteById(id);
-        return true;
+    public void deleteProcedureById(UUID procedureId, UUID userId) {
+        Procedure procedure = procedureRepository.findByIdAndUserId(procedureId, userId).orElseThrow(() -> new RuntimeException("Procedimento não existe."));
+
+        procedureRepository.delete(procedure);
     }
 
 }
