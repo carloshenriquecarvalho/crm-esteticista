@@ -6,6 +6,8 @@ import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.model.procedure.Procedure;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,6 +62,18 @@ public class User implements UserDetails {
 
     public User() {}
 
+    public User(String name, String email, String password, boolean enabled, boolean accountNonLocked, Set<UserRole> roles) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.enabled = enabled;
+        this.accountNonLocked = accountNonLocked;
+        this.roles = roles;
+    }
+
+
+    public User(@NotBlank String name, @NotNull String email, @NotNull String password) {
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
