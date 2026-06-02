@@ -1,5 +1,7 @@
 package br.com.pimentaestetica.crm.service;
 
+import br.com.pimentaestetica.crm.dto.request.ProcedureRequest;
+import br.com.pimentaestetica.crm.dto.response.ProcedureResponse;
 import br.com.pimentaestetica.crm.model.procedure.Procedure;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.repository.ProcedureRepository;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,7 +27,13 @@ public class ProcedureService {
 
     // Create
     @Transactional
-    public Procedure createProcedure(Procedure procedure, UUID userId) {
+    public Procedure createProcedure(ProcedureRequest procedureRequest, UUID userId) {
+        Procedure procedure = new Procedure();
+
+        procedure.setName(procedureRequest.name());
+        procedure.setValue(procedureRequest.value());
+        procedure.setDurationMinutes(procedureRequest.durationMinutes());
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         user.addProcedure(procedure);
@@ -35,26 +44,29 @@ public class ProcedureService {
 
     // Read
     // Get All Procedures
-    public List<Procedure> getAllProcedures(UUID userId) {
-        return procedureRepository.findAllByUserId(userId, Sort.by("name").ascending());
+    public List<ProcedureResponse> getAllProcedures(UUID userId) {
+        return  procedureRepository.findAllByUserId(userId, Sort.by("name").ascending()).stream()
+                .map(ProcedureResponse::new)
+                .toList();
     }
 
     // Get procedure by id
-    public Optional<Procedure> getProcedureById(UUID procedureId, UUID userId) {
-        return procedureRepository.findByIdAndUserId(procedureId, userId);
+    public ProcedureResponse getProcedureById(UUID procedureId, UUID userId) {
+        return new ProcedureResponse(procedureRepository.findByIdAndUserId(procedureId, userId).orElseThrow(() -> new RuntimeException("Procedimento não encontrado")));
     }
 
     // Update procedure by id
     @Transactional
-    public Procedure updateProcedureById(UUID procedureId, Procedure procedureData, UUID userId) {
+    public ProcedureResponse updateProcedureById(UUID procedureId, ProcedureRequest procedureData, UUID userId) {
         Procedure procedure = procedureRepository.findByIdAndUserId(procedureId, userId)
                 .orElseThrow(() -> new RuntimeException("Procedimento não encontrado"));
 
-        procedure.setName(procedureData.getName());
-        procedure.setValue(procedureData.getValue());
-        procedure.setActive(procedureData.getActive());
+        procedure.setName(procedureData.name());
+        procedure.setValue(procedureData.value());
+        procedure.setDurationMinutes(procedureData.durationMinutes());
+        procedureRepository.save(procedure);
 
-        return procedureRepository.save(procedure);
+        return new ProcedureResponse(procedure);
     }
 
     // Delete procedure by id
