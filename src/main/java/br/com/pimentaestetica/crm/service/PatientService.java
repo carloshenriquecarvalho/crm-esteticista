@@ -66,12 +66,9 @@ public class PatientService {
 
     // Delete by Id
     @Transactional
-    public boolean deletePatientById(UUID id){
-        if(!patientRepository.existsById(id)){
-            throw new RuntimeException("Paciente nao encontrado");
-        }
-       patientRepository.deleteById(id);
-        return true;
+    public void deletePatientById(UUID patientId, UUID userId){
+        Patient patient = patientRepository.findByIdAndUserId(patientId, userId).orElseThrow(() ->  new RuntimeException("Paciente nao encontrado"));
+       patientRepository.delete(patient);
     }
 
 }

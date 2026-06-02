@@ -33,9 +33,9 @@ public class PatientController {
     }
 
     // Get by Id
-    @GetMapping("/{id}")
-    public ResponseEntity<Patient> getById(@PathVariable UUID id, @AuthenticationPrincipal User user) {
-        return patientService.getPatientById(id, user.getId())
+    @GetMapping("/{patientId}")
+    public ResponseEntity<Patient> getById(@PathVariable UUID patientId, @AuthenticationPrincipal User user) {
+        return patientService.getPatientById(patientId, user.getId())
                 .map(patient -> ResponseEntity.ok().body(patient))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -48,9 +48,9 @@ public class PatientController {
     }
 
     // Delete - Retorna 204 No Content
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        patientService.deletePatientById(id);
+    @DeleteMapping("/{patientId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID patientId, @AuthenticationPrincipal User user) {
+        patientService.deletePatientById(patientId, user.getId());
         return ResponseEntity.noContent().build();
     }
 }
