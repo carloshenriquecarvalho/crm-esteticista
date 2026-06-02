@@ -8,6 +8,8 @@ import br.com.pimentaestetica.crm.dto.response.RegisterUserResponse;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.model.user.UserRole;
 import br.com.pimentaestetica.crm.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Autenticação", description = "Endpoints para autenticação de usuário.")
 public class AuthController {
 
     @Autowired
@@ -44,6 +47,7 @@ public class AuthController {
     public AuthController(){}
 
     @PostMapping("/login")
+    @Operation(summary = "Recebe credenciais de login do usuário.", description = "Retorna um token JWT para validação de usuário e segurança para qualquer outra requisição.")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
         var userAndPasswordToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         Authentication authentication = authenticationManager.authenticate(userAndPasswordToken);
@@ -56,6 +60,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Recebe credenciais de registro do usuário.", description = "Retorna email e senha cadastrados para o usuário.")
     public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request){
         User user = new User();
         user.setPassword(passwordEncoder.encode(request.password()));

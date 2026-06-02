@@ -4,6 +4,8 @@ import br.com.pimentaestetica.crm.model.appointment.Appointment;
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.service.BeauticianService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,12 +18,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/beautician")
+@Tag(name = "Esteticistas", description = "Endpoints para gerenciamento seguro das esteticistas.")
 public class BeauticianController {
 
     @Autowired
     private BeauticianService beauticianService;
 
     @PostMapping
+    @Operation(summary = "Cria uma nova esteticista segura.", description = "Gera uma esteticista atrelada ao usuário extraído do JWT.")
     public ResponseEntity<Beautician> add(@RequestBody Beautician beautician, @AuthenticationPrincipal User user) {
         Beautician created = beauticianService.createBeautician(beautician, user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -29,6 +33,7 @@ public class BeauticianController {
 
     // Get All by User
     @GetMapping("/all")
+    @Operation(summary = "Recebe todas as esteticistas.", description = "Retorna todas as esteticistas que estão atreladas ao usuário extraído do JWT.")
     public ResponseEntity<List<Beautician>> getAll(@AuthenticationPrincipal User user) {
         List<Beautician> beauticians = beauticianService.getAllBeauticians(user.getId());
         return ResponseEntity.ok(beauticians);
@@ -36,6 +41,7 @@ public class BeauticianController {
 
     // Get by Id
     @GetMapping("/{beauticianId}")
+    @Operation(summary = "Recebe apenas uma esteticista.", description = "Retorna uma única esteticista baseado no id da esteticista e que esteja atrelada ao id do usuário extraído do JWT.")
     public ResponseEntity<Beautician> getById(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {
         return beauticianService.getBeauticianById(beauticianId, user.getId())
                 .map(beautician -> ResponseEntity.ok().body(beautician))
@@ -44,6 +50,7 @@ public class BeauticianController {
 
     // Update
     @PutMapping("/{beauticianId}")
+    @Operation(summary = "Atualiza uma esteticista.", description = "Retorna uma única esteticista atualizada a partir do id da esteticista e do id do usuário extraído do JWT.")
     public ResponseEntity<Beautician> update(@PathVariable UUID beauticianId, @RequestBody Beautician beautician, @AuthenticationPrincipal User user) {
         Beautician updatedBeautician = beauticianService.updateBeauticianById(
                 user.getId(),
@@ -55,6 +62,7 @@ public class BeauticianController {
 
     // Delete - Retorna 204 No Content
     @DeleteMapping("/{beauticianId}")
+    @Operation(summary = "Deleta uma esteticista.", description = "Deleta a esteticista através do seu id e que esteja atrelada ao usuário.")
     public ResponseEntity<Void> delete(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {
         beauticianService.deleteBeauticianById(beauticianId, user.getId());
         return ResponseEntity.noContent().build();
