@@ -38,15 +38,15 @@ public class BeauticianService {
     }
 
     // Get one By Id
-    public Optional<Beautician> getBeauticianById(UUID id){
-        return Optional.of(beauticianRepository.findById(id)
+    public Optional<Beautician> getBeauticianById(UUID beauticianId, UUID userId){
+        return Optional.of(beauticianRepository.findByIdAndUserId(beauticianId, userId)
                 .orElseThrow(() -> new RuntimeException("Esteticista não encontrada")));
     }
 
     // Update by Id
     @Transactional
-    public Beautician updateBeauticianById(UUID id, Beautician beauticianData) {
-        Beautician beautician = beauticianRepository.findById(id)
+    public Beautician updateBeauticianById(UUID beauticianId, Beautician beauticianData, UUID userId) {
+        Beautician beautician = beauticianRepository.findByIdAndUserId(beauticianId, userId)
                 .orElseThrow(() -> new RuntimeException("Paciente nao encontrado"));
 
         beautician.setActive(true);
@@ -59,12 +59,9 @@ public class BeauticianService {
 
     // Delete by Id
     @Transactional
-    public boolean deleteBeauticianById(UUID id){
-        if(!beauticianRepository.existsById(id)){
-            throw new RuntimeException("Esteticista nao encontrada");
-        }
-        beauticianRepository.deleteById(id);
-        return true;
+    public void deleteBeauticianById(UUID beauticianId, UUID userId){
+        Beautician beautician = beauticianRepository.findByIdAndUserId(beauticianId, userId).orElseThrow(() -> new RuntimeException("Esteticista não encontrada"));
+        beauticianRepository.delete(beautician);
     }
 
 

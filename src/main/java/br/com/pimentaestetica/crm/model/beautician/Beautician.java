@@ -26,10 +26,14 @@ public class Beautician {
     @OneToMany(mappedBy = "beautician", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
 
-    // ... Restante do código mantido sem alterações
-    @Column(name = "name", nullable = false) private String name;
-    @Column(name = "email", nullable = false, unique = true) private String email;
-    @Enumerated(EnumType.STRING) @Column(name = "status", nullable = false) private BeauticianStatus status;
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Enumerated(EnumType.STRING) @Column(name = "status", nullable = false)
+    private BeauticianStatus status;
     @Column(name = "active") private Boolean active = true;
     public Beautician(){}
     public UUID getId() { return id; }
