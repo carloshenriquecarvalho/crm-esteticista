@@ -1,5 +1,6 @@
 package br.com.pimentaestetica.crm.service;
 
+import br.com.pimentaestetica.crm.dto.request.PatientRequest;
 import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.repository.PatientRepository;
@@ -25,9 +26,15 @@ public class PatientService {
 
     // Create
     @Transactional
-    public Patient createPatient(Patient patient, UUID userId){
+    public Patient createPatient(PatientRequest patientRequest, UUID userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Patient patient = new Patient();
+
+        patient.setName(patientRequest.name());
+        patient.setEmail(patientRequest.email());
+        patient.setPhoneNumber(patientRequest.phoneNumber());
 
         user.addPatient(patient);
 
@@ -42,9 +49,9 @@ public class PatientService {
     }
 
     // Get By Id
-    public Optional<Patient> getPatientById(UUID userId, UUID patientId){
-        return Optional.of(patientRepository.findByIdAndUserId(patientId, userId)
-                .orElseThrow(() -> new RuntimeException("Paciente não encontrado")));
+    public Patient getPatientById(UUID userId, UUID patientId){
+        return patientRepository.findByIdAndUserId(patientId, userId)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
     }
 
     // Update by Id

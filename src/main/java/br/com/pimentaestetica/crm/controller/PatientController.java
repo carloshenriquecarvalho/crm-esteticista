@@ -1,5 +1,7 @@
 package br.com.pimentaestetica.crm.controller;
 
+import br.com.pimentaestetica.crm.dto.request.PatientRequest;
+import br.com.pimentaestetica.crm.dto.response.PatientResponse;
 import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.service.PatientService;
@@ -24,34 +26,37 @@ public class PatientController {
 
     @PostMapping
     @Operation(summary = "Cria um novo paciente seguro.", description = "Gera um novo paciente atrelado ao usuário extraído do JWT.")
-    public ResponseEntity<Patient> add(@RequestBody Patient patient, @AuthenticationPrincipal User user) {
-        Patient created = patientService.createPatient(patient, user.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<PatientResponse> add(@RequestBody PatientRequest patientRequest, @AuthenticationPrincipal User user) {
+        Patient patient = patientService.createPatient(patientRequest, user.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new PatientResponse(patient));
     }
 
     // Get All by User
     @GetMapping("/all")
     @Operation(summary = "Recebe todos os pacientes.", description = "Retorna todos os pacientes que estão atrelados ao usuário extraído do JWT.")
-    public ResponseEntity<List<Patient>> getAll(@AuthenticationPrincipal User user) {
-        List<Patient> patients = patientService.getAllPatients(user);
-        return ResponseEntity.ok(patients);
+    public ResponseEntity<List<PatientResponse>> getAll(@AuthenticationPrincipal User user) {
+        List<PatientResponse> patientResponses = patientService.getAllPatients(user).stream().map(PatientResponse::new).toList();
+        return ResponseEntity.ok(patientResponses);
     }
 
     // Get by Id
     @GetMapping("/{patientId}")
     @Operation(summary = "Recebe apenas um paciente.", description = "Retorna um único paciente baseado no id do paciente e que esteja atrelada ao id do usuário extraído do JWT.")
-    public ResponseEntity<Patient> getById(@PathVariable UUID patientId, @AuthenticationPrincipal User user) {
-        return patientService.getPatientById(patientId, user.getId())
-                .map(patient -> ResponseEntity.ok().body(patient))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<PatientResponse> getById(@PathVariable UUID patientId, @AuthenticationPrincipal User user) {
+        Patient patient =  patientService.getPatientById(user.getId(), patientId);
+
+        return ResponseEntity.ok(new PatientResponse(patient));
     }
 
     // Update
     @PutMapping
     @Operation(summary = "Atualiza um paciente.", description = "Retorna um único paciente atualizado a partir do id do paciente e do id do usuário extraído do JWT.")
-    public ResponseEntity<Patient> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody Patient patient) {
+    public ResponseEntity<PatientResponse> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody Patient patient) {
         Patient updated = patientService.updatePatientById(user.getId(), patientId, patient);
-        return ResponseEntity.ok(updated);
+
+
+        return ResponseEntity.ok(new PatientResponse(updated));
     }
 
     // Delete
