@@ -69,7 +69,7 @@ public class BeauticianController {
         return ResponseEntity.ok(new BeauticianResponse(updatedBeautician));
     }
 
-    // Delete
+    // Delete4
     @DeleteMapping("/{beauticianId}")
     @Operation(summary = "Deleta uma esteticista.", description = "Deleta a esteticista através do seu id e que esteja atrelada ao usuário.")
     public ResponseEntity<Void> delete(@PathVariable UUID beauticianId, @AuthenticationPrincipal User user) {

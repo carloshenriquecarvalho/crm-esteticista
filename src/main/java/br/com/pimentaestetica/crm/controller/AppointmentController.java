@@ -1,7 +1,10 @@
 package br.com.pimentaestetica.crm.controller;
 
+import br.com.pimentaestetica.crm.dto.request.AppointmentRequest;
+import br.com.pimentaestetica.crm.dto.response.AppointmentResponse;
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
 
+import br.com.pimentaestetica.crm.model.appointment.AppointmentAvailability;
 import br.com.pimentaestetica.crm.model.user.User;
 import br.com.pimentaestetica.crm.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,39 +29,42 @@ public class AppointmentController {
     // Create Patient
     @PostMapping
     @Operation(summary = "Cria um novo agendamento seguro.", description = "Gera um agendamento atrelado ao usuário extraído do JWT.")
-    public ResponseEntity<Appointment> create(@RequestBody Appointment appointment, @AuthenticationPrincipal User user) {
-        Appointment createdAppointment = appointmentService.createAppointment(
-                appointment,
-                user.getId(),
-                appointment.getPatient().getId(),
-                appointment.getBeautician().getId(),
-                appointment.getProcedure().getId()
-        );
+    public ResponseEntity<AppointmentResponse> create(@RequestBody AppointmentRequest appointmentRequest, @RequestBody UUID patientId, @RequestBody UUID beauticianId, @RequestBody UUID procedureId, @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointment);
+        Appointment createdAppointment = appointmentService.createAppointment(appointmentRequest, user.getId(), patientId, beauticianId, procedureId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AppointmentResponse(createdAppointment));
     }
 
     // Get all appointments by user id
     @GetMapping("/all")
     @Operation(summary = "Recebe todos os agendamentos.", description = "Retorna todos os agendamentos que estão atrelados ao usuário extraído do JWT.")
-    public ResponseEntity<List<Appointment>> getAll(@AuthenticationPrincipal User user) {
-        List<Appointment> appointments = appointmentService.getAllAppointments(user.getId());
-        return ResponseEntity.ok(appointments);
+    public ResponseEntity<List<AppointmentResponse>> getAll(@AuthenticationPrincipal User user) {
+        List<AppointmentResponse> appointmentResponses = appointmentService.getAllAppointments(user.getId()).stream().map(AppointmentResponse::new).toList();
+        return ResponseEntity.ok(appointmentResponses);
     }
 
     // Get appointment by id
     @GetMapping("/{appointmentId}")
     @Operation(summary = "Recebe apenas um agendamento.", description = "Retorna um único agendamento baseado no id do agendamento e que esteja atrelado ao id do usuário extraído do JWT.")
-    public ResponseEntity<Appointment> getById(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user) {
-        return appointmentService.getAppointmentById(appointmentId, user.getId())
-                .map(appointment -> ResponseEntity.ok().body(appointment))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<AppointmentResponse> getById(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user) {
+        AppointmentResponse appointmentResponse = new AppointmentResponse(appointmentService.getAppointmentById(appointmentId, user.getId()).orElseThrow(() -> new RuntimeException("Agendamento não encontrado.")));
+
+        return ResponseEntity.ok(appointmentResponse);
     }
 
     // Update appointment
     @PutMapping("/{appointmentId}")
     @Operation(summary = "Atualiza um agendamento.", description = "Retorna um único agendamento atualizado a partir do id do agendamento e do id do usuário extraído do JWT.")
-    public ResponseEntity<Appointment> update(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user, @RequestBody Appointment appointment) {
+    public ResponseEntity<AppointmentResponse> update(@PathVariable UUID appointmentId, @AuthenticationPrincipal User user, @RequestBody AppointmentRequest appointmentRequest) {
+
+        Appointment appointment = new Appointment();
+
+        appointment.setAppointmentAvailability(AppointmentAvailability.valueOf(appointmentRequest.availability()));
+        appointment.setDateTimeStart(appointmentRequest.dateTimeStart());
+        appointment.setTitle(appointmentRequest.title());
+
+
         Appointment updatedAppointment = appointmentService.updateAppointmentById(
                 user.getId(),
                 appointmentId,
@@ -68,7 +74,7 @@ public class AppointmentController {
                 appointment.getProcedure() != null ? appointment.getProcedure().getId() : null
         );
 
-        return ResponseEntity.ok(updatedAppointment);
+        return ResponseEntity.ok(new AppointmentResponse(updatedAppointment));
     }
 
     // Delete appointment

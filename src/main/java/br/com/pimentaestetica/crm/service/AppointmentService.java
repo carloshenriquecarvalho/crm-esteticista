@@ -1,6 +1,8 @@
 package br.com.pimentaestetica.crm.service;
 
+import br.com.pimentaestetica.crm.dto.request.AppointmentRequest;
 import br.com.pimentaestetica.crm.model.appointment.Appointment;
+import br.com.pimentaestetica.crm.model.appointment.AppointmentAvailability;
 import br.com.pimentaestetica.crm.model.beautician.Beautician;
 import br.com.pimentaestetica.crm.model.patient.Patient;
 import br.com.pimentaestetica.crm.model.procedure.Procedure;
@@ -36,7 +38,15 @@ public class AppointmentService {
     // CRUD
     // Create by user id
     @Transactional
-    public Appointment createAppointment(Appointment appointment, UUID userId, UUID patientId, UUID beauticianId, UUID procedureId){
+    public Appointment createAppointment(AppointmentRequest appointmentRequest, UUID userId, UUID patientId, UUID beauticianId, UUID procedureId){
+
+        Appointment appointment = new Appointment();
+
+        AppointmentAvailability appointmentAvailability = AppointmentAvailability.valueOf(appointmentRequest.availability());
+
+        appointment.setTitle(appointmentRequest.title());
+        appointment.setAppointmentAvailability(appointmentAvailability);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         Patient patient = patientRepository.findById(patientId)

@@ -49,7 +49,6 @@ public class Appointment {
 
     public Appointment(){}
 
-    // ... Construtores, Getters e Setters mantidos exatamente iguais
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public String getTitle() { return title; }
