@@ -1,6 +1,6 @@
 # Pimenta Estética CRM - Backend API
 
-API RESTful desenvolvida em Java com Spring Boot 3 para o gerenciamento de clínicas de estética. O sistema permite o controle de usuários, pacientes, esteticistas, procedimentos e agendamentos, utilizando uma arquitetura robusta com segurança JWT e controle de versão de banco de dados.
+API RESTful desenvolvida em Java com Spring Boot para o gerenciamento de clínicas de estética. O sistema permite o controle de usuários, pacientes, esteticistas, procedimentos e agendamentos, utilizando uma arquitetura robusta com segurança JWT e controle de versão de banco de dados com o Flyway.
 
 ## Stack Tecnológica
 
@@ -11,6 +11,7 @@ API RESTful desenvolvida em Java com Spring Boot 3 para o gerenciamento de clín
 * **Banco de Dados:** PostgreSQL (Produção) / H2 Database (Testes de Integração)
 * **Documentação:** Springdoc OpenAPI (Swagger)
 * **Validação:** Hibernate Validator
+* **Infraestrutura:** Docker para conteinerização do projeto e Flyway para migrations (versionamento do banco de dados).
 
 ---
 
@@ -18,13 +19,15 @@ API RESTful desenvolvida em Java com Spring Boot 3 para o gerenciamento de clín
 
 O projeto foi construído focando em eficiência e segurança de dados, implementando as seguintes abordagens técnicas:
 
-### 1. Serialização Segura de Entidades (Jackson)
+### 1. Serialização de Entidades
 Para o MVP, a API trafega entidades de domínio cruas. Para evitar o clássico loop infinito de serialização em relacionamentos bidirecionais (ex: `User` -> `Patient` -> `User`), o sistema utiliza um mapeamento rigoroso com o Jackson:
 * `@JsonManagedReference`: Nas coleções da entidade pai, como a clase `User`.
 * `@JsonBackReference`: Nas chaves estrangeiras das entidades filhas, como `Patient` e `Appointment`, nomeando cada referência para evitar conflitos de `InvalidDefinitionException`.
 
+Contudo, hoje, na última atualização (03/06/2026), o projeto conta com a implementação de DTOs de forma mais profissional tanto para os requests quanto para as responses (bem como também para loginRequest e loginResponse e registerRequest e registerResponse).
+
 ### 2. Autenticação Stateless (JWT)
-O controle de acesso é 100% Stateless.
+O controle de acesso é Stateless.
 * Endpoints `/auth/login` e `/auth/register` utilizam DTOs (Records) validados.
 * Senhas são hasheadas com `BCryptPasswordEncoder`.
 * As requisições protegidas passam por um `SecurityFilter` customizado (`OncePerRequestFilter`) que valida a assinatura do token HMAC256 e injeta a autorização no `SecurityContextHolder`.
@@ -55,7 +58,6 @@ O MVP está funcional, seguro e testado. O fluxo central de negócios (Cadastro 
 
 **Roadmap (Próxima Sprint):**
 * **Pivotagem de Domínio (`Clinic`):** O nó central dos relacionamentos deixará de ser o `User`. Será criada a entidade `Clinic`, transformando o `User` em um membro da equipe/operador, o que permitirá múltiplas clínicas e gestão de níveis de acesso (RBAC) mais complexa.
-* **Camada de DTOs:** Substituir o tráfego das entidades `@Entity` diretamente nos Controllers por `ResponseDTOs`, removendo a necessidade das anotações `@JsonBackReference` e ocultando metadados do banco.
 * **Tratamento Global de Erros:** Implementar um `@RestControllerAdvice` para capturar `DataIntegrityViolationException` e `MethodArgumentNotValidException`, padronizando o JSON de resposta de erros (RFC 7807 - Problem Details).
 
 ---
