@@ -42,7 +42,7 @@ public class AppointmentService {
 
         Appointment appointment = new Appointment();
 
-        AppointmentAvailability appointmentAvailability = AppointmentAvailability.valueOf(appointmentRequest.availability());
+        AppointmentAvailability appointmentAvailability = AppointmentAvailability.UNPAID;
 
         appointment.setTitle(appointmentRequest.title());
         appointment.setAppointmentAvailability(appointmentAvailability);

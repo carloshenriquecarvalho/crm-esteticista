@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/appointment")
+@RequestMapping("/api/appointments")
 @Tag(name = "Agendamentos", description = "Endpoints para gerenciamento da agenda da clínica.")
 public class AppointmentController {
     @Autowired
@@ -29,9 +29,9 @@ public class AppointmentController {
     // Create Patient
     @PostMapping
     @Operation(summary = "Cria um novo agendamento seguro.", description = "Gera um agendamento atrelado ao usuário extraído do JWT.")
-    public ResponseEntity<AppointmentResponse> create(@RequestBody AppointmentRequest appointmentRequest, @RequestBody UUID patientId, @RequestBody UUID beauticianId, @RequestBody UUID procedureId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<AppointmentResponse> create(@RequestBody AppointmentRequest appointmentRequest, @AuthenticationPrincipal User user) {
 
-        Appointment createdAppointment = appointmentService.createAppointment(appointmentRequest, user.getId(), patientId, beauticianId, procedureId);
+        Appointment createdAppointment = appointmentService.createAppointment(appointmentRequest, user.getId(), appointmentRequest.patientId(), appointmentRequest.beauticianId(), appointmentRequest.procedureId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AppointmentResponse(createdAppointment));
     }
@@ -60,7 +60,7 @@ public class AppointmentController {
 
         Appointment appointment = new Appointment();
 
-        appointment.setAppointmentAvailability(AppointmentAvailability.valueOf(appointmentRequest.availability()));
+        appointment.setAppointmentAvailability(AppointmentAvailability.UNPAID);
         appointment.setDateTimeStart(appointmentRequest.dateTimeStart());
         appointment.setTitle(appointmentRequest.title());
 

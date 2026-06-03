@@ -28,15 +28,11 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = this.recoverToken(request);
-        System.out.println("DEBUG 1 - Token recebido do Postman: " + token);
         if (token != null) {
             String email = tokenConfig.validateToken(token);
-            System.out.println("DEBUG 2 - Email extraído do Token: " + email);
             if (!email.isEmpty()) {
                 UserDetails user = userRepository.findUserByEmail(email)
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-                System.out.println("DEBUG 3 - Usuario autenticado no banco: " + user.getUsername());
 
                 var authentication = new UsernamePasswordAuthenticationToken(
                         user,

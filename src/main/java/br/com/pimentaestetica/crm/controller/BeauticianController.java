@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/beautician")
+@RequestMapping("/api/beauticians")
 @Tag(name = "Esteticistas", description = "Endpoints para gerenciamento seguro das esteticistas.")
 public class BeauticianController {
 

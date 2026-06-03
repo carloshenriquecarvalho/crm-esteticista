@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/patient")
+@RequestMapping("/api/patients")
 @Tag(name = "Pacientes", description = "Endpoints para gerenciamento de pacientes.")
 public class PatientController {
 
@@ -50,7 +50,7 @@ public class PatientController {
     }
 
     // Update
-    @PutMapping
+    @PutMapping("/{patientId}")
     @Operation(summary = "Atualiza um paciente.", description = "Retorna um único paciente atualizado a partir do id do paciente e do id do usuário extraído do JWT.")
     public ResponseEntity<PatientResponse> update(@PathVariable UUID patientId, @AuthenticationPrincipal User user, @RequestBody PatientRequest patientRequest) {
         Patient updated = patientService.updatePatientById(user.getId(), patientId, patientRequest);

@@ -17,7 +17,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("CRM - RESTful API")
-                        .version("1.0.0")
+                        .version("60.30.10")
                         .description("API corporativa para gerenciamento de clínicas de estética, agendamentos e pacientes."))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/procedure")
+@RequestMapping("/api/procedures")
 @Tag(name = "Procedimentos", description = "Endpoints para gerenciamento de procedimentos.")
 public class ProcedureController {
 
